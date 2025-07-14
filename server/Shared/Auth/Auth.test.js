@@ -4,9 +4,9 @@ import { Auth } from './Auth.js'
 import { setUserToken, getUserToken, setAdminToken, getAdminToken } from '../../../test/helperTest/testStore.js'
 const agent = session(serverTest)
 
-describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
-  describe('Auth.generateToken, Auth.verifyToken. ', () => {
-    it('should generate a JWT and allow access through the verifyToken middleware and set the userInfo object (req.useInfo)', async () => {
+describe('"Auth" class.', () => {
+  describe('generateToken, verifyToken. ', () => {
+    it('should generate a JWT and allow access and set the userInfo object (req.useInfo)', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 1, otherField: 'other' }
       const token = Auth.generateToken(user)
       setUserToken(token)
@@ -55,7 +55,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
       expect(test.body.message).toBe('Invalid token')
       expect(test.body.data).toBe(null)
     })
-    it('should return 401 if token is expired', async () => {
+    test.concurrent('should return 401 if token is expired', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 1, otherField: 'other' }
       const expiredToken = Auth.generateToken(user, 1)
       // Esperamos 2 segundos para asegurarnos de que expire
@@ -70,7 +70,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
       expect(test.body.data).toBe(null)
     })
   })
-  describe('Auth.checkRole', () => {
+  describe('checkRole', () => {
     it('should allow access if user has an allowed role', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 1, otherField: 'other' }
       const token = Auth.generateToken(user)
@@ -100,7 +100,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
       expect(test.body.userInfo).toBe(undefined)
     })
   })
-  describe('Auth.generateEmailVerificationToken and Auth.verifyEmailToken methods. Email verification.', () => {
+  describe('Email verification.', () => {
     it('should verify email token and return userId in userInfo', async () => {
       const user = { id: '123', email: 'userexample@test.com' }
       const token = Auth.generateEmailVerificationToken(user)

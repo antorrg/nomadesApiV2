@@ -6,8 +6,9 @@ import BaseController from '../../Shared/Controllers/BaseController.js'
 import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
 import HelperItem from './HelperItem.js'
 import ImageHandler from '../../Configs/ImageHandler.js'
+import { Auth } from '../../Shared/Auth/Auth.js'
 
-const ItemRep = new GeneralRepository(Item) // Model, dataEmpty
+const ItemRep = new GeneralRepository(Item, HelperItem.emptyItem) // Model, dataEmpty
 export const itemServ = new ItemService(ItemRep, 'Item', 'text', HelperItem.itemCleaner, true, ImageHandler, 'img')// Repo, fieldName, parserFunction useImage, deleteImages, nameImage
 const item = new BaseController(itemServ)
 
@@ -17,19 +18,33 @@ const updateItem = [{ name: 'text', type: 'string' }, { name: 'img', type: 'stri
 const itemRouter = express.Router()
 
 itemRouter.post(
-  '/',
+  '/create',
+  Auth.verifyToken,
   MiddlewareHandler.validateFields(createItem),
   item.create
 )
 
 itemRouter.get(
-  '/:id',
+  '/public/:id',
   MiddlewareHandler.middIntId('id'),
   item.getById
+)
+itemRouter.get(
+  '/',
+  Auth.verifyToken,
+  MiddlewareHandler.middIntId('id'),
+  item.getAdminAll
+)
+itemRouter.get(
+  '/:id',
+  Auth.verifyToken,
+  MiddlewareHandler.middIntId('id'),
+  item.getAdminById
 )
 
 itemRouter.put(
   '/:id',
+  Auth.verifyToken,
   MiddlewareHandler.middIntId('id'),
   MiddlewareHandler.validateFields(updateItem),
   item.update
@@ -37,6 +52,7 @@ itemRouter.put(
 
 itemRouter.delete(
   '/:id',
+  Auth.verifyToken,
   MiddlewareHandler.middIntId('id'),
   item.delete
 )

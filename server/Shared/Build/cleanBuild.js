@@ -33,12 +33,12 @@ const copyFiltered = async () => {
   })
 
   // Copiar index.js desde la raíz del proyecto
-  const indexSrc = path.join(rootDir, 'index.js')
-  const indexDest = path.join(distRootDir, 'index.js')
+  const indexSrc = path.join(rootDir, 'server.js')
+  const indexDest = path.join(distRootDir, 'server.js')
 
   if (await fs.pathExists(indexSrc)) {
     await fs.copy(indexSrc, indexDest)
-    console.log('📦 index.js copiado a /dist')
+    console.log('📦 server.js copiado a /dist')
   }
 
   console.log('✅ Build limpio generado en /dist')

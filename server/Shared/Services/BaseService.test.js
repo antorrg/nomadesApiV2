@@ -1,7 +1,7 @@
 import BaseRepository from '../Repositories/BaseRepository.js'
 import BaseService from './BaseService.js'
 import { Landing } from '../../Configs/database.js'
-import * as info from '../Repositories/helpers/baseRep.test.js'
+import * as info from '../Repositories/helpers/baseRep.help.js'
 import { MockDeleteImagesFalse, MockDeleteImagesTrue } from '../../../test/helperTest/generalFunctions.js'
 
 class TestClass extends BaseRepository {
@@ -64,7 +64,8 @@ describe('Test unitarios de la clase BaseService: CRUD.', () => {
     it('Metodo "getAll": deberia retornar un arreglo con los servicios', async () => {
       const element = info.createSecondData
       await serv.create(element)
-      const response = await servParse.getAll()
+      const isAdmin = false
+      const response = await servParse.getAll({ isAdmin })
       expect(response.success).toBe(true)
       expect(response.message).toBe('Data found successfully')
       expect(response.data).toEqual([
@@ -96,7 +97,15 @@ describe('Test unitarios de la clase BaseService: CRUD.', () => {
           image: 'https://metalogo.com.ar',
           description: 'descripcion',
           enable: true
+        },
+        {
+          id: 2,
+          title: 'Titulo de la landing2',
+          image: 'https://metalogo.com.ar',
+          description: 'descripcion',
+          enable: true
         }
+
       ])
     })
   })
@@ -125,7 +134,7 @@ describe('Test unitarios de la clase BaseService: CRUD.', () => {
         expect(error).toBeInstanceOf(Error)
         expect(error.status).toBe(500)
         expect(error.message).toBe(
-          'Error deleting from db ImageUrl: https://metalogo.com.ar'
+          'Error deleting ImageUrl: https://imagen.com.ar'
         )
       }
     })

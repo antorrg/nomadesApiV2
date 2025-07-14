@@ -14,7 +14,7 @@ export default class LandingHelper {
     return {
       id: false,
       title: 'Pagina web con ejemplos ',
-      infoHeader: 'Nomades web site.',
+      info_header: 'Nomades web site.',
       image: 'https://img.freepik.com/fotos-premium/naturaleza-natural-paisajes-naturales_1417-70.jpg',
       description: 'Esta es una descripcion del producto mostrado hecha para exhibir el contenido de la pagina',
       enable: true

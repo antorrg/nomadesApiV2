@@ -20,6 +20,19 @@ export default class UserHelper {
     }
   }
 
+  static emptyUser () {
+    return {
+      id: false,
+      email: 'No hay datos aun',
+      nickname: 'No hay datos aun',
+      given_name: 'No hay datos aun',
+      picture: env.userImg,
+      role: 'No hay datos aun',
+      country: 'No hay datos aun',
+      enable: 'No hay datos aun'
+    }
+  }
+
   static async createUserDefault (req, res, next) {
     const user = req.body
     if (!user || !user.email) { return next(middError('Email es requerido', 400)) }

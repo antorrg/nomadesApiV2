@@ -9,12 +9,13 @@ export default class UserController extends BaseController {
   login = eh.catchController(async (req, res) => {
     const data = req.body
     const response = await this.service.login(data)
-    return BaseController.oldResp(200, response.data)
+    console.log('llegue: ', response.data)
+    return BaseController.oldResp(res, 200, response.data)
   })
 
   verifyPass = eh.catchController(async (req, res) => {
     const data = req.body
-    const response = await this.service.login(data)
-    return BaseController.oldResp(200, response.message)
+    const response = await this.service.verifyPass(data)
+    return BaseController.oldResp(res, 200, response.message)
   })
 }

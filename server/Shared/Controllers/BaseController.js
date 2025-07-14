@@ -90,7 +90,10 @@ export default class BaseController {
     return BaseController.oldResp(
       res,
       200,
-      response.message
+      {
+        message: response.message,
+        results: response.data
+      }
     )
   })
 

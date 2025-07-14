@@ -21,7 +21,7 @@ export default class BaseService {
   }
 
   async handleImageDeletion (imageUrl, useImg = false) {
-    if (this.useImage && imageUrl && useImg) {
+    if (this.useImage && useImg && imageUrl) {
       await this.deleteImages.deleteImageFromDb(imageUrl)
     }
   }
@@ -43,7 +43,7 @@ export default class BaseService {
       return {
         success: true,
         message: `${this.fieldName} create successfully`,
-        data: newRecord
+        data: this.parserFunction ? this.parserFunction(newRecord) :newRecord
       }
     } catch (error) {
       throw error
@@ -95,8 +95,8 @@ export default class BaseService {
   dataFound[this.nameImage] !== newData[this.nameImage]
 
     if (isImageChanged) {
-      await this.handleImageDeletion(newData[this.nameImage], true)
-      await this.handleImageProcess(dataFound[this.nameImage], false)
+      await this.handleImageDeletion(newData[this.nameImage], newData.useImg)
+      await this.handleImageProcess(dataFound[this.nameImage], newData.saver)
     }
 
     const upData = await this.Repository.update(id, newData)
@@ -108,7 +108,7 @@ export default class BaseService {
     return {
       success: true,
       message: `${this.fieldName} updated successfully`,
-      data: upData
+      data: this.parserFunction? this.parserFunction(upData) : upData
     }
   }
 

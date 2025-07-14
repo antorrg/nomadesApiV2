@@ -1,3 +1,4 @@
+import { beforeAll, afterAll, beforeEach } from 'vitest'
 import { sequelize } from '../server/Configs/database.js'
 
 // Esta función inicializa la base de datos

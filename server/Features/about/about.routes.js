@@ -6,5 +6,5 @@ import BaseController from '../../Shared/Controllers/BaseController.js'
 import ImageHandler from '../../Configs/ImageHandler.js'
 
 const aboutRouter = express.Router()
-
+// En construcción
 export default aboutRouter

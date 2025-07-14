@@ -9,9 +9,8 @@ export default {
     },
     {
       displayName: 'integration',
-      testMatch: ['<rootDir>/tests/integration/**/*.spec.js'],
+      testMatch: ['<rootDir>/test/**/*.int.spec.js'],
       setupFilesAfterEnv: ['./test/jest.setup.js']
     }
   ]
 }
- 

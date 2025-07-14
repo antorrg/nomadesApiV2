@@ -40,11 +40,13 @@ export default class ProductService extends BaseService {
           createdItems.push(item)
         }
       }
-
+        const productCreated = this.parserFunction? this.parserFunction(product) : product
       return {
         success: true,
         message: `${this.fieldName} created successfully`,
-        data: { product, items: createdItems }
+        data: { 
+            product: productCreated,
+             items: createdItems }
       }
     } catch (error) {
       throw error

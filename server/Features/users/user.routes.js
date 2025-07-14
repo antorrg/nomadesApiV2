@@ -9,8 +9,8 @@ import ImageHandler from '../../Configs/ImageHandler.js'
 import * as util from './userUtilities.js'
 import { Auth } from '../../Shared/Auth/Auth.js'
 
-const userRepo = new GeneralRepository(User)
-const userServ = new UserService(
+const userRepo = new GeneralRepository(User, UserHelper.emptyUser)
+export const userServ = new UserService(
   userRepo,
   'User',
   'email',

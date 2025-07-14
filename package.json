@@ -2,12 +2,13 @@
   "name": "nomadesv2",
   "version": "1.0.0",
   "description": "Una aplicación Express generada con Bash",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node dist/index.js",
-    "dev": "cross-env NODE_ENV=development nodemon index.js",
-    "unit:test": "cross-env NODE_ENV=test jest --detectOpenHandles",
+    "start": "cross-env NODE_ENV=production node dist/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
+    "unit:test": "cross-env NODE_ENV=test vitest run server/**/*.test.js",
+    "integration:test": "cross-env NODE_ENV=test vitest run test/**/*.int.spec.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "build": "node ./server/Shared/Build/cleanBuild.js",
@@ -24,35 +25,23 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
+    "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
     "uuid": "^11.1.0"
   },
-  "babel": {
-    "env": {
-      "test": {
-        "presets": [
-          "@babel/preset-env"
-        ]
-      }
-    }
-  },
   "eslintConfig": {
     "extends": "./node_modules/standard/eslintrc.json"
   },
   "devDependencies": {
-    "@babel/cli": "^7.27.2",
-    "@babel/core": "^7.27.7",
-    "@babel/preset-env": "^7.27.2",
-    "babel-jest": "^30.0.2",
     "inquirer": "^12.6.3",
-    "jest": "^30.0.3",
     "nodemon": "^3.1.10",
     "standard": "^17.1.2",
     "supertest": "^7.1.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "vitest": "^3.2.4"
   }
 }

@@ -38,7 +38,7 @@ describe('ProductService Unit Tests', () => {
     info_body: 'Body info',
     landing: 'test-image.jpg',
     items: [
-      { text: 'Item 1', img: 'item1.jpg'},
+      { text: 'Item 1', img: 'item1.jpg' },
       { text: 'Item 2', img: 'item2.jpg' }
     ]
   }
@@ -62,12 +62,12 @@ describe('ProductService Unit Tests', () => {
   })
 
   test('Should delete product and related items', async () => {
-   try{ 
-    const response = await product.delete(createdProductId)
-    expect(response.success).toBe(true)
-    expect(response.message).toBe('Product deleted successfully')
-    expect(response.data).toBe('Test Product')
-  }catch(err){console.log(err)}
+    try {
+      const response = await product.delete(createdProductId)
+      expect(response.success).toBe(true)
+      expect(response.message).toBe('Product deleted successfully')
+      expect(response.data).toBe('Test Product')
+    } catch (err) { console.log(err) }
 
     // Confirm that product no longer exists
     await expect(product.getById(createdProductId)).rejects.toThrow()

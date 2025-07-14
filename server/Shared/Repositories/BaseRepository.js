@@ -43,7 +43,7 @@ export default class BaseRepository {
       ).findAll({ where: filters })
       if (!existingRecord) { throwError('Unexpected error', 500) }
       if (existingRecord.length === 0) {
-        return [this.dataEmpty] || [{ message: 'No data yet' }]
+        return [this.dataEmpty()] || [{ message: 'No data yet' }]
       }
       return existingRecord
     } catch (error) {

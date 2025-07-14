@@ -7,13 +7,14 @@ import LandingHelper from './LandingHelper.js'
 import ImageHandler from '../../Configs/ImageHandler.js'
 import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
 import { Auth } from '../../Shared/Auth/Auth.js'
+import mailRouter from '../mails/mail.routes.js'
+// import MockImgsService from '../../../test/helperTest/mockImages.js'
 
 const landCreate = [
   { name: 'title', type: 'string' },
   { name: 'image', type: 'string' },
   { name: 'info_header', type: 'string' },
-  { name: 'description', type: 'string' },
-  { name: 'useImg', type: 'boolean' }
+  { name: 'description', type: 'string' }
 ]
 const landUpdate = [
   { name: 'title', type: 'string' },
@@ -24,21 +25,27 @@ const landUpdate = [
   { name: 'useImg', type: 'boolean' }
 ]
 
-const landRepo = new GeneralRepository(Landing)
+const landRepo = new GeneralRepository(Landing, LandingHelper.dataEmptyLanding)
+
+const MockImgsService = await ImageHandler()
+
 const landServ = new BaseService(
   landRepo,
   'Landing',
   'title',
   LandingHelper.landingParser,
   true,
-  ImageHandler,
+  MockImgsService,
   'image'
 )
+
 const land = new BaseController(landServ)
+
 const landRouter = express.Router()
 
-landRouter.get('/', land.getAll)
-landRouter.get('/admin', Auth.verifyToken, land.getAdminAll)
+landRouter.use('/email', mailRouter)
+landRouter.get('/public', land.getAll)
+landRouter.get('/', Auth.verifyToken, land.getAdminAll)
 
 landRouter.post(
   '/create',
@@ -50,6 +57,7 @@ landRouter.post(
 landRouter.put(
   '/:id',
   Auth.verifyToken,
+  MiddlewareHandler.middIntId('id'),
   MiddlewareHandler.validateFields(landUpdate),
   land.update
 )

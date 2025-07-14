@@ -6,12 +6,16 @@ import helmet from 'helmet'
 import mainRouter from './routes.js'
 import eh from './Configs/errorHandlers.js'
 import env from './Configs/envConfig.js'
+import { helmetMainConfig } from './Configs/helmetConfig.js'
 
 // Inicializo la app:
 const app = express()
-app.use(morgan('dev'))
+if (env.Status !== 'test') {
+  app.use(morgan('dev'))
+}
 app.use(cors())
-app.use(helmet())
+// app.use(helmet(helmetMainConfig))
+// app.use(helmet(helmet.frameguard({ action: "deny" })))
 app.use(express.json())
 app.use(eh.jsonFormat)
 // Habilita Swagger:
@@ -23,18 +27,20 @@ if (env.Status !== 'production') {
 }
 // ⚠️ Importar Swagger solo en development
 if (env.Status === 'development') {
-  const [{ default: swaggerUi }, { default: swaggerJsDoc }, { default: swaggerOptions }] = await Promise.all([
-    import('swagger-ui-express'),
-    import('swagger-jsdoc'),
-    import('./Shared/Swagger/swaggerOptions.js')
-  ])
-  const swaggerDocs = swaggerJsDoc(swaggerOptions)
-  const swaggerUiOptions = {
-    swaggerOptions: {
-      docExpansion: 'none'
+  (async () => {
+    const [{ default: swaggerUi }, { default: swaggerJsDoc }, { default: swaggerOptions }] = await Promise.all([
+      import('swagger-ui-express'),
+      import('swagger-jsdoc'),
+      import('./Shared/Swagger/swaggerOptions.js')
+    ])
+    const swaggerDocs = swaggerJsDoc(swaggerOptions)
+    const swaggerUiOptions = {
+      swaggerOptions: {
+        docExpansion: 'none'
+      }
     }
-  }
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOptions))
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOptions))
+  })()
 }
 app.use(mainRouter)
 

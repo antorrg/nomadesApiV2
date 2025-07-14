@@ -11,7 +11,8 @@ const controllerUploader = eh.catchController(async (req, res) => {
     eh.throwError('No se subió ningún archivo', 500)
   }
   try {
-    const result = await ImageHandler.uploadNewImage(req.file)
+    const ImgService = await ImageHandler()
+    const result = await ImgService.uploadNewImage(req.file)
     console.log('URL generada:', result)
     res.json({
       url: result
@@ -21,14 +22,16 @@ const controllerUploader = eh.catchController(async (req, res) => {
   }
 })
 const getImagesFromDb = eh.catchController(async (req, res) => {
-  const response = await ImageHandler.getImages()
+  const ImgService = await ImageHandler()
+  const response = await ImgService.getImages()
   res.status(200).json(response)
 })
 
 const delImagesFromDb = eh.catchController(async (req, res) => {
   const { id } = req.params
   const isId = true
-  const response = await ImageHandler.deleteImageFromDb(id, isId)
+  const ImgService = await ImageHandler()
+  const response = await ImgService.deleteImageFromDb(id, isId)
   res.status(200).json(response)
 })
 

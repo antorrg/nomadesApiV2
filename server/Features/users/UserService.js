@@ -46,11 +46,12 @@ export default class UserService extends BaseService {
   async login (data) {
     const isLogin = true
     const user = await this.#validUser(data, isLogin)
+    const userParsed = this.parserFunction ? this.parserFunction(user) : user
     const token = Auth.generateToken(user)
     return {
       success: true,
       message: 'Login exitoso',
-      data: { user, token }
+      data: { user: userParsed, token }
     }
   }
 
