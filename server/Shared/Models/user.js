@@ -18,7 +18,7 @@ export default (sequelize) => {
       allowNull: false,
       defaultValue: 1,
       validate: {
-        isIn: [[0, 1, 2, 9]] // Por ejemplo, 0: admin, 1: user, 2: moderator, 9:superUser
+        isIn: [[1, 2, 3, 9]] // Por ejemplo, 1: user, 2: moderator, 3: admin, 9:superUser
       }
     },
     country: {

@@ -13,6 +13,7 @@ export default class BaseController {
   // Controllers:
   create = catchController(async (req, res) => {
     const data = req.body
+    console.log('create: ', data)
     const response = await this.service.create(data)
     return BaseController.oldResp(
       res,

@@ -1,9 +1,11 @@
 import { beforeAll, afterAll, beforeEach } from 'vitest'
 import { sequelize } from '../server/Configs/database.js'
+import usersMock from './helperTest/loginToken.help.js'
 
 // Esta función inicializa la base de datos
-async function initializeDatabase () {
+export async function initializeDatabase () {
   try {
+    await sequelize.drop()
     await sequelize.authenticate()
     await sequelize.sync({ force: true }) // Esto limpia y sincroniza la base de datos
     // console.log('Base de datos sincronizada exitosamente ✔️')
@@ -18,6 +20,7 @@ export async function resetDatabase () {
 }
 
 beforeAll(async () => {
+  await sequelize.drop()
   await initializeDatabase()
 })
 

@@ -1,8 +1,8 @@
 import session from 'supertest'
-import serverTest from './testHelpers/serverTest.js'
+import serverTest from './testHelpers/serverTest.help.js'
 const agent = session(serverTest)
 
-describe('Clase "MiddlewareHandler". Clase estatica de middlewares. Validacion y tipado de datos', () => {
+describe('Clase "MiddlewareHandler". Validacion y tipado de datos', () => {
   describe('Metodo "validateFields". Validacion y tipado datos en body (POST y PUT)', () => {
     it('deberia validar, tipar los parametros y permitir el paso si estos fueran correctos.', async () => {
       const data = {

@@ -68,21 +68,21 @@ export default class UserService extends BaseService {
   async update (id, newData) {
     const dataFound = await this.Repository.getById(id, newData)
     if (!dataFound) throwError('Usuario no encontrado', 404)
-    const noDelete = UserHelper.protectProtocol(dataFound)
+    const noUpdate = UserHelper.protectUpdateProtocol2(dataFound, newData)
     if (
-      noDelete &&
-      (newData.email || newData.password || newData.role || newData.enable)
+      noUpdate
     ) {
       throwError('Accion no permitida', 403)
     }
-    await super.update(id, newData)
+    return await super.update(id, newData)
   }
 
   async delete (id) {
-    const dataFound = await this.Repository.getById(id)
+    const isAdmin = true
+    const dataFound = await this.Repository.getById(id, isAdmin)
     if (!dataFound) throwError('Usuario no encontrado', 404)
     const noDelete = UserHelper.protectProtocol(dataFound)
     if (noDelete) throwError('Accion no permitida', 403)
-    await super.delete(id)
+    return await super.delete(id)
   }
 }

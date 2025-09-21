@@ -1,12 +1,15 @@
 import { User } from '../../Configs/database.js'
 import env from '../../Configs/envConfig.js'
+import bcrypt from 'bcrypt'
 
 const initialUser = async () => {
+  const hasheredPass = await bcrypt.hash(env.RootPass, 12)
   const data = {
-    email: env.user,
-    password: env.pass,
+    email: env.RootEmail,
+    nickname: env.RootEmail.split('@')[0],
+    password: hasheredPass,
     role: 9,
-    picture: env.image
+    picture: env.UserImg
   }
   try {
     const users = await User.findAll()

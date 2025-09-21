@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer'
 import env from '../../Configs/envConfig.js'
 import eh from '../../Configs/errorHandlers.js'
 
+
 export default {
   senderMail: async (email, issue, message) => {
     // este console.log de arriba me da que la info es correcta: email es el remitente,

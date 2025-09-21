@@ -4,9 +4,10 @@ import GeneralRepository from '../../Shared/Repositories/GeneralRepositoy.js'
 import ProductService from './ProducService.js'
 import itemRouter, { itemServ } from '../item/item.routes.js'
 import BaseController from '../../Shared/Controllers/BaseController.js'
-import ImageHandler from '../../Configs/ImageHandler.js'
+import ImgsService from '../../Shared/Services/ImgsService.js'
 import HelperProduct from './HelperProduct.js'
-import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
+import { Validator } from 'req-valid-express'
+import * as schemas from './productschemas.mjs'
 import { Auth } from '../../Shared/Auth/Auth.js'
 
 const prodRep = new GeneralRepository(Product, HelperProduct.emptyProduct)
@@ -16,7 +17,7 @@ export const productService = new ProductService(
   'title',
   HelperProduct.cleanerProduct,
   true,
-  ImageHandler,
+  ImgsService,
   'landing',
   itemServ,
   'Item',
@@ -41,33 +42,35 @@ productRouter.get(
 
 productRouter.get(
   '/public/:id',
-  MiddlewareHandler.middIntId('id'),
+  Validator.paramId('id', Validator.ValidReg.INT),
   product.getById
 )
 productRouter.get(
   '/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
+  Validator.paramId('id', Validator.ValidReg.INT),
   product.getAdminById
 )
 
 productRouter.post(
   '/create',
   Auth.verifyToken,
+  Validator.validateBody(schemas.create),
   product.create
 )
 
 productRouter.put(
   '/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
+  Validator.paramId('id', Validator.ValidReg.INT),
+  Validator.validateBody(schemas.update),
   product.update
 )
 
 productRouter.delete(
   '/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
+  Validator.paramId('id', Validator.ValidReg.INT),
   product.delete
 )
 

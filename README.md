@@ -39,3 +39,72 @@ La aplicación cuenta con Repositories, Services, Controllers y Middlewares gene
 La aplicación puede ejecutarse con `npm run dev` (modo desarrollo) o `npm start` (producción). Los tests pueden ejecutarse solo una vez que se hayan definido los modelos y conectado la base de datos.
 
 
+
+## 📸 Flujo de manejo de imágenes
+
+El servicio trabaja con **tres casos principales** al actualizar o eliminar registros que incluyen imágenes.
+Se usan dos flags en el `body`:
+
+* `useImg`: indica si se debe **seguir usando la imagen anterior**.
+* `saver`: indica si se debe **guardar la imagen anterior en la base de datos** (sin eliminarla del storage).
+
+---
+
+### 1. Creación (`create`)
+
+* El registro se crea en DB con la URL de la imagen nueva (`picture`, `landing`, etc.).
+* Si se habilita manejo de imágenes (`useImage = true` en el servicio), la imagen nueva reemplaza a la anterior.
+* La anterior, si existía, se elimina mediante `handleImageDeletion`.
+
+---
+
+### 2. Actualización (`update`)
+
+1. Se compara la URL de la imagen en DB (`oldImgUrl`) con la nueva (`newData[nameImage]`).
+
+   * Si no cambió, no se hace nada.
+
+   * Si cambió, entran las opciones:
+
+   * **`saver: true`**
+     → La imagen anterior se guarda en la tabla `Image` (persistencia histórica).
+     → No se elimina del storage.
+
+   * **`useImg: true`**
+     → El cliente pide seguir usando la imagen anterior.
+     → Se elimina el registro en la tabla `Image`, pero la imagen en storage se conserva.
+
+   * **Caso por defecto (`saver: false` y `useImg: false`)**
+     → La imagen anterior se elimina tanto de la DB como del storage.
+
+---
+
+### 3. Eliminación (`delete`)
+
+* Si el registro tiene imagen:
+
+  * **`saver: true`** no aplica aquí (ya que la intención es borrar el registro).
+  * Se borra la referencia en DB (`deleteImageFromDb`).
+  * Se borra también del storage (`oldImagesHandler(..., false)`).
+
+---
+
+### 4. Recuperación (`getAll`, `getById`, etc.)
+
+* Se devuelven los registros con la URL activa de la imagen.
+* En el caso de no existir imágenes en DB, `ImgsService.getImages` devuelve una **imagen de fallback** (referencial).
+
+---
+
+### 🔎 Ejemplo práctico con flags
+
+| Operación                           | useImg  | saver   | Resultado                                                         |
+| ----------------------------------- | ------- | ------- | ----------------------------------------------------------------- |
+| **Update** con imagen nueva         | `false` | `false` | Borra la anterior de DB y storage, guarda la nueva.               |
+| **Update** con imagen nueva         | `false` | `true`  | Guarda la anterior en DB, mantiene en storage, registra la nueva. |
+| **Update** manteniendo imagen vieja | `true`  | `false` | Reusa la vieja, elimina solo la referencia en DB.                 |
+| **Delete** de registro              | —       | —       | Borra imagen en DB y storage.                                     |
+
+
+---
+

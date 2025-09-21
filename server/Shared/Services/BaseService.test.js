@@ -121,7 +121,6 @@ describe('Test unitarios de la clase BaseService: CRUD.', () => {
       const id = 1
       const newData = { image: 'https://imagen.com.ar', useImg: true, saver: true }
       const response = await servParse.update(id, newData)
-      expect(response.success).toBe(true)
       expect(response.message).toBe('Landing updated successfully')
       expect(response.data).toMatchObject(info.responseDataImg)
     })

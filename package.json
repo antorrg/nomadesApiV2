@@ -7,10 +7,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "dev": "cross-env NODE_ENV=development nodemon server.js",
-    "unit:test": "cross-env NODE_ENV=test vitest run server/**/*.test.js",
+    "unit:test": "cross-env NODE_ENV=test vitest run",
     "integration:test": "cross-env NODE_ENV=test vitest run test/**/*.int.spec.js",
-    "lint": "standard",
-    "lint:fix": "standard --fix",
+    "lint": "standard --fix",
     "build": "node ./server/Shared/Build/cleanBuild.js",
     "gen:schema": "node server/Shared/Swagger/schemas/tools/generateSchema.js"
   },
@@ -28,6 +27,7 @@
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
+    "req-valid-express": "^1.0.6",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
     "uuid": "^11.1.0"
@@ -36,6 +36,7 @@
     "extends": "./node_modules/standard/eslintrc.json"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
     "inquirer": "^12.6.3",
     "nodemon": "^3.1.10",
     "standard": "^17.1.2",

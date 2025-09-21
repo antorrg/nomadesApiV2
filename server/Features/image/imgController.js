@@ -1,6 +1,6 @@
 import eh from '../../Configs/errorHandlers.js'
 import multer from 'multer'
-import ImageHandler from '../../Configs/ImageHandler.js'
+import ImgsService from '../../Shared/Services/ImgsService.js'
 
 // Configuración de Multer
 const storage = multer.memoryStorage()
@@ -11,8 +11,7 @@ const controllerUploader = eh.catchController(async (req, res) => {
     eh.throwError('No se subió ningún archivo', 500)
   }
   try {
-    const ImgService = await ImageHandler()
-    const result = await ImgService.uploadNewImage(req.file)
+    const result = await ImgsService.uploadNewImage(req.file)
     console.log('URL generada:', result)
     res.json({
       url: result
@@ -22,16 +21,14 @@ const controllerUploader = eh.catchController(async (req, res) => {
   }
 })
 const getImagesFromDb = eh.catchController(async (req, res) => {
-  const ImgService = await ImageHandler()
-  const response = await ImgService.getImages()
+  const response = await ImgsService.getImages()
   res.status(200).json(response)
 })
 
 const delImagesFromDb = eh.catchController(async (req, res) => {
   const { id } = req.params
   const isId = true
-  const ImgService = await ImageHandler()
-  const response = await ImgService.deleteImageFromDb(id, isId)
+  const response = await ImgsService.deleteImageFromDb(id, isId)
   res.status(200).json(response)
 })
 

@@ -49,7 +49,7 @@ async function mockfunctiondelete (imageUrl) {
   const filename = path.basename(imageUrl)
   const filePath = path.join('./uploads', filename)
   try {
-    await setTimeout(() => { fs.unlink(filePath) }, 1000)
+    await setTimeout(() => { fs.unlink(filePath) }, 200)
     return true
   } catch (err) {
     console.error('Error al borrar imagen local:', err)
@@ -57,6 +57,7 @@ async function mockfunctiondelete (imageUrl) {
   }
 }
 async function saveImageInDb (imageUrl) {
+  console.log('este es la imagen: ', imageUrl)
   try {
     const image = await Image.findOne({ where: { imageUrl } })
     if (image) eh.throwError('Esta imagen ya fue guardada', 400)
@@ -64,6 +65,7 @@ async function saveImageInDb (imageUrl) {
     const docRef = await Image.create({
       imageUrl
     })
+    console.log('guarde bien')
     if (!docRef) {
       eh.throwError('Error inesperado en el servidor', 500)
     }

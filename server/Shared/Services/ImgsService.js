@@ -1,6 +1,11 @@
 import { deleteFromCloudinary, uploadToCloudinary } from '../../cloudinary.js'
+import MockImgsService from './MockImgsService.js'
 import eh from '../../Configs/errorHandlers.js'
+import env from '../../Configs/envConfig.js'
 import { Image } from '../../Configs/database.js'
+
+const deleteImage = env.Status !== 'production'? MockImgsService.mockFunctionDelete : deleteFromCloudinary
+const selectUploaders = env.Status !== 'production'? MockImgsService.mockUploadNewImage : uploadToCloud
 
 export default class ImgsService {
   static #saveImageInDb = async (imageUrl) => {
@@ -25,21 +30,13 @@ export default class ImgsService {
     return info
   }
 
-  static uploadNewImage = async (file) => {
-    const result = await uploadToCloudinary(file)
-    const httpsWebpUrl = cloudinary.url(result.public_id, {
-      secure: true,
-      format: 'webp',
-      transformation: [
-        { width: 'auto', crop: 'scale' },
-        { fetch_format: 'auto', quality: 'auto' }
-      ]
-    })
-    return httpsWebpUrl
-  }
+  static uploadNewImage = async(file) =>{
+    return await selectUploaders(file)
+  } 
 
-  static oldImagesHandler = (imageUrl, isRedirect) => {
-    return isRedirect ? this.#saveImageInDb(imageUrl) : deleteFromCloudinary(imageUrl)
+
+  static oldImagesHandler = async(imageUrl, isRedirect) => {
+    return isRedirect===true ? await this.#saveImageInDb(imageUrl) : await deleteImage(imageUrl)
   }
 
   static deleteImageFromDb = async (data, isId) => {
@@ -63,3 +60,15 @@ export default class ImgsService {
     }
   }
 }
+  const uploadToCloud = async (file) => {
+    const result = await uploadToCloudinary(file)
+    const httpsWebpUrl = cloudinary.url(result.public_id, {
+      secure: true,
+      format: 'webp',
+      transformation: [
+        { width: 'auto', crop: 'scale' },
+        { fetch_format: 'auto', quality: 'auto' }
+      ]
+    })
+    return httpsWebpUrl
+  }

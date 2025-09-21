@@ -41,6 +41,8 @@ build/Release
 node_modules/
 jspm_packages/
 dist/
+test/helperTest/uploads/*
+!test/helperTest/uploads/.gitkeep
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

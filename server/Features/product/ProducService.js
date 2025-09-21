@@ -37,16 +37,17 @@ export default class ProductService extends BaseService {
       if (Array.isArray(items)) {
         for (const element of items) {
           const item = await this.secondServ.create({ ...element, ProductId }, this.secondUniqueField)
-          createdItems.push(item)
+          createdItems.push(item.data)
         }
       }
-        const productCreated = this.parserFunction? this.parserFunction(product) : product
+      const productCreated = this.parserFunction ? this.parserFunction(product) : product
       return {
         success: true,
         message: `${this.fieldName} created successfully`,
-        data: { 
-            product: productCreated,
-             items: createdItems }
+        data: {
+          product: productCreated,
+          items: createdItems
+        }
       }
     } catch (error) {
       throw error
@@ -56,10 +57,11 @@ export default class ProductService extends BaseService {
   // Traer producto por id + sus ítems relacionados
   async getById (id, isAdmin = false) {
     const dataFound = await this.Repository.getById(id, isAdmin)
-    const ProdId = dataFound.ProductId
-    const filter = { ProductId: ProdId }
-    const items = await this.secondServ.getAll({ isAdmin, filter })
+    const filters = { ProductId: dataFound.id}
+   // console.log('soy el filter en service: ', filters)
+    const items = await this.secondServ.getAll( isAdmin, { ProductId: dataFound.id})
     const itemsFound = items.data
+    //console.dir(itemsFound)
 
     return {
       success: true,

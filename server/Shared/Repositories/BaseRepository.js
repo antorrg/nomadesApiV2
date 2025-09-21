@@ -36,8 +36,9 @@ export default class BaseRepository {
     }
   }
 
-  async getAll ({ isAdmin = false, filters = {} } = {}) {
+  async getAll ( isAdmin = false, filters={} ) {
     try {
+      //console.log('soy el filter: ', filters)
       const existingRecord = await this.Model.scope(
         isAdmin ? 'allRecords' : 'enabledOnly'
       ).findAll({ where: filters })

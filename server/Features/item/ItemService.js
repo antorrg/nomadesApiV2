@@ -5,8 +5,8 @@ export default class ItemService extends BaseService {
     super(Repository, fieldName, uniqueField, parserFunction, useImage, deleteImages, nameImage)
   }
 
-  async getAll ({ isAdmin = false, filters = {} }) {
-    const response = await this.Repository.getAll({ isAdmin, filters })
+  async getAll (isAdmin, filters) {
+    const response = await this.Repository.getAll( isAdmin, filters )
     return {
       success: true,
       message: 'Data found successfully',

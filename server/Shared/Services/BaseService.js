@@ -28,10 +28,11 @@ export default class BaseService {
 
   async handleImageProcess (oldImgUrl, saver = false) {
     if (!this.useImage || !this.deleteImages || !this.deleteImages.oldImagesHandler) return
-    if (this.useImage && oldImgUrl && saver) {
+    if (this.useImage && oldImgUrl && saver===true) {
       await this.deleteImages.oldImagesHandler(oldImgUrl, true)
+    }else{
+      await this.deleteImages.oldImagesHandler(oldImgUrl, false)
     }
-    await this.deleteImages.oldImagesHandler(oldImgUrl, false)
   }
 
   async create (data) {
@@ -43,15 +44,15 @@ export default class BaseService {
       return {
         success: true,
         message: `${this.fieldName} create successfully`,
-        data: this.parserFunction ? this.parserFunction(newRecord) :newRecord
+        data: this.parserFunction ? this.parserFunction(newRecord) : newRecord
       }
     } catch (error) {
       throw error
     }
   }
 
-  async getAll ({ isAdmin = false }) {
-    const response = await this.Repository.getAll({ isAdmin })
+  async getAll (isAdmin) {
+    const response = await this.Repository.getAll(isAdmin)
     return {
       success: true,
       message: 'Data found successfully',
@@ -85,37 +86,38 @@ export default class BaseService {
   }
 
   async update (id, newData) {
-    const imageUrl = ''
-    const oldImgUrl = ''
-
-    const dataFound = await this.Repository.getById(id, newData)
+    let imageUrl = ''
+    let oldImgUrl = ''
+    const isAdmin = true
+   
+    const dataFound = await this.Repository.getById(id, isAdmin)
 
     const isImageChanged = this.useImage &&
   dataFound[this.nameImage] &&
   dataFound[this.nameImage] !== newData[this.nameImage]
 
     if (isImageChanged) {
-      await this.handleImageDeletion(newData[this.nameImage], newData.useImg)
-      await this.handleImageProcess(dataFound[this.nameImage], newData.saver)
+      imageUrl = newData[this.nameImage]
+      oldImgUrl = dataFound[this.nameImage]
     }
 
     const upData = await this.Repository.update(id, newData)
-
     if (isImageChanged) {
-      await this.handleImageDeletion(imageUrl)
-      await this.handleImageProcess(oldImgUrl)
+      await this.handleImageDeletion(imageUrl, newData.useImg)
+      await this.handleImageProcess(oldImgUrl,  newData.saver)
     }
     return {
-      success: true,
       message: `${this.fieldName} updated successfully`,
-      data: this.parserFunction? this.parserFunction(upData) : upData
+      data: this.parserFunction ? this.parserFunction(upData) : upData
     }
   }
 
   async delete (id) {
     let oldImgUrl = ''
+   
     try {
-      const dataFound = await this.Repository.getById(id)
+      const isAdmin = true
+      const dataFound = await this.Repository.getById(id, isAdmin)
       const dataReg = dataFound[this.fieldName]
       this.useImage ? (oldImgUrl = dataFound[this.nameImage]) : ''
 

@@ -10,6 +10,10 @@ export default (sequelize) => {
     imageUrl: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    enable: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   }, {
     scopes: {

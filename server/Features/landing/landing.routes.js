@@ -4,30 +4,16 @@ import GeneralRepository from '../../Shared/Repositories/GeneralRepositoy.js'
 import BaseService from '../../Shared/Services/BaseService.js'
 import BaseController from '../../Shared/Controllers/BaseController.js'
 import LandingHelper from './LandingHelper.js'
-import ImageHandler from '../../Configs/ImageHandler.js'
-import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
+import ImgsService from '../../Shared/Services/ImgsService.js'
+import { Validator } from 'req-valid-express'
 import { Auth } from '../../Shared/Auth/Auth.js'
 import mailRouter from '../mails/mail.routes.js'
+import * as schemas from './landingschemas.mjs'
 // import MockImgsService from '../../../test/helperTest/mockImages.js'
-
-const landCreate = [
-  { name: 'title', type: 'string' },
-  { name: 'image', type: 'string' },
-  { name: 'info_header', type: 'string' },
-  { name: 'description', type: 'string' }
-]
-const landUpdate = [
-  { name: 'title', type: 'string' },
-  { name: 'image', type: 'string' },
-  { name: 'info_header', type: 'string' },
-  { name: 'description', type: 'string' },
-  { name: 'saver', type: 'boolean' },
-  { name: 'useImg', type: 'boolean' }
-]
 
 const landRepo = new GeneralRepository(Landing, LandingHelper.dataEmptyLanding)
 
-const MockImgsService = await ImageHandler()
+//const MockImgsService = await 
 
 const landServ = new BaseService(
   landRepo,
@@ -35,7 +21,7 @@ const landServ = new BaseService(
   'title',
   LandingHelper.landingParser,
   true,
-  MockImgsService,
+  ImgsService,
   'image'
 )
 
@@ -43,22 +29,28 @@ const land = new BaseController(landServ)
 
 const landRouter = express.Router()
 
-landRouter.use('/email', mailRouter)
+landRouter.use('/public/emails', mailRouter)
 landRouter.get('/public', land.getAll)
 landRouter.get('/', Auth.verifyToken, land.getAdminAll)
+
+landRouter.get(
+  '/:id', 
+  Auth.verifyToken, 
+  Validator.paramId('id', Validator.ValidReg.INT),
+  land.getAdminById)
 
 landRouter.post(
   '/create',
   Auth.verifyToken,
-  MiddlewareHandler.validateFields(landCreate),
+  Validator.validateBody(schemas.landCreate),
   land.create
 )
 
 landRouter.put(
   '/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
-  MiddlewareHandler.validateFields(landUpdate),
+  Validator.paramId('id', Validator.ValidReg.INT),
+  Validator.validateBody(schemas.landUpdate),
   land.update
 )
 

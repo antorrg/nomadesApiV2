@@ -1,17 +1,20 @@
 import session from 'supertest'
 import app from '../server/app.js'
 import usersMock from './helperTest/loginToken.help.js'
+import prepareTestImages from './helperTest/prepareTestImages.js'
 import * as store from './helperTest/testStore.js'
 const agent = session(app)
 
 describe('Integration Work test', () => {
+   let imagesCopied = []
   beforeAll(async () => {
     await usersMock()
+     imagesCopied = await prepareTestImages(2)
   })
   describe('Route "/api/v2/work/public".', () => {
     it('should retrieve a array of one element by default if do not exist elements', async () => {
       const test = await agent
-        .get('/api/v1/work/public')
+        .get('/api/v2/work/public')
         .expect(200)
       expect(test.body).toEqual([{
         id: false,
@@ -25,7 +28,7 @@ describe('Integration Work test', () => {
   describe('Route "/api/v2/work/:id". Private route', () => {
     it('should retrieve a array of working pages with a validate user', async () => {
       const test = await agent
-        .get('/api/v1/work')
+        .get('/api/v2/work')
         .set('Authorization', `Bearer ${store.getUserToken()}`)
         .expect(200)
       expect(test.body).toEqual([{
@@ -41,13 +44,13 @@ describe('Integration Work test', () => {
     it('should create a working page.', async () => {
       const data = {
         title: 'aun no hay datos',
-        image: 'http://localhost:4000/test/helperTest/uploads/amarillo1.jpg',
+        image: imagesCopied[0],
         text: 'aun no hay datos',
         enable: true,
         useImg: false
       }
       const test = await agent
-        .post('/api/v1/work/create')
+        .post('/api/v2/work/create')
         .set('Authorization', `Bearer ${store.getUserToken()}`)
         .send(data)
         .expect(201)
@@ -55,7 +58,7 @@ describe('Integration Work test', () => {
       expect(test.body).toEqual({
         id: expect.any(Number),
         title: 'aun no hay datos',
-        image: 'http://localhost:4000/test/helperTest/uploads/amarillo1.jpg',
+        image: imagesCopied[0],
         text: 'aun no hay datos',
         enable: true
       })
@@ -63,13 +66,13 @@ describe('Integration Work test', () => {
     it('should throw an error by try create the same working twice.', async () => {
       const data = {
         title: 'aun no hay datos',
-        image: 'http://localhost:4000/test/helperTest/uploads/amarillo1.jpg',
+        image: imagesCopied[0],
         text: 'aun no hay datos',
         enable: true,
         useImg: false
       }
       const test = await agent
-        .post('/api/v1/work/create')
+        .post('/api/v2/work/create')
         .set('Authorization', `Bearer ${store.getUserToken()}`)
         .send(data)
         .expect(400)
@@ -79,13 +82,13 @@ describe('Integration Work test', () => {
   describe('Route "/api/v2/work/:id". Private route', () => {
     it('should retrieve an element with a validate user', async () => {
       const test = await agent
-        .get(`/api/v1/work/${store.getId()}`)
+        .get(`/api/v2/work/${store.getId()}`)
         .set('Authorization', `Bearer ${store.getUserToken()}`)
         .expect(200)
       expect(test.body).toEqual({
         id: expect.any(Number),
         title: 'aun no hay datos',
-        image: 'http://localhost:4000/test/helperTest/uploads/amarillo1.jpg',
+        image: imagesCopied[0],
         text: 'aun no hay datos',
         enable: true
       })
@@ -96,13 +99,13 @@ describe('Integration Work test', () => {
       const data = {
         title: 'aun no hay datos',
         text: 'aun no hay datos',
-        image: 'http://localhost:4000/test/helperTest/uploads/amarillo9.jpg', // campo nuevo
+        image: imagesCopied[1], // campo nuevo
         enable: true,
         saver: false,
         useImg: false
       }
       const test = await agent
-        .put(`/api/v1/work/${store.getId()}`)
+        .put(`/api/v2/work/${store.getId()}`)
         .set('Authorization', `Bearer ${store.getUserToken()}`)
         .send(data)
         .expect(200)
@@ -110,7 +113,7 @@ describe('Integration Work test', () => {
       expect(test.body.results).toEqual({
         id: expect.any(Number),
         title: 'aun no hay datos',
-        image: 'http://localhost:4000/test/helperTest/uploads/amarillo9.jpg',
+        image: imagesCopied[1],
         text: 'aun no hay datos',
         enable: true
       })
@@ -119,7 +122,7 @@ describe('Integration Work test', () => {
   describe('Route "/api/v2/work/:id". Private route', () => {
     it('should delete an element', async () => {
       const test = await agent
-        .delete(`/api/v1/work/${store.getId()}`)
+        .delete(`/api/v2/work/${store.getId()}`)
         .set('Authorization', `Bearer ${store.getUserToken()}`)
         .expect(200)
       expect(test.body).toBe('Work deleted successfully')

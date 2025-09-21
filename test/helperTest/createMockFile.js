@@ -19,3 +19,8 @@ export default function createMockFile (filename = 'test.jpg') {
     throw error // no lo silencies, para que falle bien el test
   }
 }
+export  function mockImages (){
+  const src = path.join(fixtureDir, "sample.png");
+  const dest = path.join(uploadDir, "sample.png");
+   fs.copyFile(src, dest);
+}

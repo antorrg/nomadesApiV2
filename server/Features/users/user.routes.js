@@ -3,9 +3,9 @@ import { User } from '../../Configs/database.js'
 import GeneralRepository from '../../Shared/Repositories/GeneralRepositoy.js'
 import UserService from './UserService.js'
 import UserController from './UserController.js'
-import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
+import { Validator } from 'req-valid-express'
 import UserHelper from './UserHelper.js'
-import ImageHandler from '../../Configs/ImageHandler.js'
+import * as schema from './userSchemas/index.js'
 import * as util from './userUtilities.js'
 import { Auth } from '../../Shared/Auth/Auth.js'
 
@@ -23,17 +23,26 @@ const user = new UserController(userServ)
 
 const userRouter = express.Router()
 
-userRouter.get('/', user.getAll)
+userRouter.get(
+  '/',
+  Auth.verifyToken,
+  user.getAdminAll
+)
 
-userRouter.get('/:id', MiddlewareHandler.middUuid('id'), user.getById)
+userRouter.get(
+  '/:id',
+  Auth.verifyToken,
+  Validator.paramId('id', Validator.ValidReg.UUIDv4),
+  user.getAdminById
+)
 
 userRouter.post(
   '/create',
   Auth.verifyToken,
   Auth.checkRole([0, 9]),
-  MiddlewareHandler.validateFields(util.userCreate),
-  MiddlewareHandler.validateRegex(
-    util.email,
+  Validator.validateBody(schema.userCreate),
+  Validator.validateRegex(
+    util.emailRegex,
     'email',
     'Introduzca un mail valido'
   ),
@@ -43,14 +52,14 @@ userRouter.post(
 
 userRouter.post(
   '/login',
-  MiddlewareHandler.validateFields(util.userLogin),
-  MiddlewareHandler.validateRegex(
-    util.email,
+  Validator.validateBody(schema.userLogin),
+  Validator.validateRegex(
+    util.emailRegex,
     'email',
     'Introduzca un mail valido'
   ),
-  MiddlewareHandler.validateRegex(
-    util.password,
+  Validator.validateRegex(
+    util.passwordRegex,
     'password',
     'La contraseña debe incluir por lo menos 8 caracteres 1 mayuscula'
   ),
@@ -61,55 +70,45 @@ userRouter.post(
   '/update',
   Auth.verifyToken,
   UserHelper.verifyOwnerActions,
-  MiddlewareHandler.validateFields(util.verifyPassword),
-  MiddlewareHandler.validateRegex(util.uuidv4, 'id', 'Id inválido'),
-  MiddlewareHandler.validateRegex(
-    util.password,
+  Validator.validateBody(schema.verifypassword),
+  Validator.validateRegex(util.uuidv4Regex, 'id', 'Id inválido'),
+  Validator.validateRegex(
+    util.passwordRegex,
     'password',
     'La contraseña debe incluir por lo menos 8 caracteres 1 mayuscula'
   ),
   user.verifyPass
 )
 
-userRouter.get('/protect', Auth.verifyToken, user.getAdminAll)
-
-userRouter.get(
-  '/protect/:id',
-  Auth.verifyToken,
-  MiddlewareHandler.middUuid('id'),
-  user.getAdminById
-)
-
-userRouter.put(
+userRouter.patch(
   // editar perfil
   '/profile/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middUuid('id'),
-  MiddlewareHandler.validateFields(util.userUpd),
-  UserHelper.verifyOwnerActions,
+  Validator.paramId('id', Validator.ValidReg.UUIDv4),
+  Validator.validateBody(schema.userUpd),
+  UserHelper.verifyOwnerActionsParams,
   UserHelper.profileParserInfo,
   user.update
 )
 
-userRouter.put(
+userRouter.patch(
   // reset password
   '/reset/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middUuid('id'),
+  Validator.paramId('id', Validator.ValidReg.UUIDv4),
   Auth.checkRole([0, 9]),
   UserHelper.resetPassParser,
   user.update
 )
 
-userRouter.put(
+userRouter.patch(
   // cambiar password
   '/update/:id',
   Auth.verifyToken,
-  Auth.checkRole([0, 9]),
-  MiddlewareHandler.middUuid('id'),
-  MiddlewareHandler.validateFields(util.changePassword),
-  MiddlewareHandler.validateRegex(
-    util.password,
+  Validator.paramId('id', Validator.ValidReg.UUIDv4),
+  Validator.validateBody(schema.changePassword),
+  Validator.validateRegex(
+    util.passwordRegex,
     'password',
     'La contraseña debe incluir por lo menos 8 caracteres 1 mayuscula'
   ),
@@ -118,17 +117,22 @@ userRouter.put(
   user.update
 )
 
-userRouter.put(
+userRouter.patch(
   // cambiar permisos, bloqueo
   '/upgrade/:id',
   Auth.verifyToken,
-  Auth.checkRole([0, 9]),
-  MiddlewareHandler.middUuid('id'),
-  MiddlewareHandler.validateFields(util.userUpgrade),
+  Auth.checkRole([3, 9]),
+  Validator.paramId('id', Validator.ValidReg.UUIDv4),
+  Validator.validateBody(schema.userupgrade),
   UserHelper.upgradeUserParser,
   user.update
 )
 
-userRouter.delete('/:id', MiddlewareHandler.middUuid('id'), user.delete)
+userRouter.delete(
+  '/:id',
+  Auth.verifyToken,
+  Validator.paramId('id', Validator.ValidReg.UUIDv4),
+  user.delete
+)
 
 export default userRouter

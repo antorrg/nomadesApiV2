@@ -31,6 +31,28 @@ const {
 Product.hasMany(Item)
 Item.belongsTo(Product)
 
+async function startUp(syncDb = false, rewrite = false){
+    try {
+        await sequelize.authenticate();
+        if (env.Status !== 'production' && syncDb) {
+            try {
+                await sequelize.sync({ force: rewrite });
+                console.log(`🧪 Synced database: "force: ${rewrite}"`);
+            }
+            catch (error) {
+                console.error('❗Error syncing database', error);
+            }
+        }
+        console.log('🟢​ Database initialized successfully!!');
+    }
+    catch (error) {
+        console.error('❌ Error conecting database!', error);
+    }
+}
+const closeDatabase = async () => {
+    await sequelize.close();
+    console.log('🛑 Database disconnect');
+};
 export {
   User,
   Product,
@@ -40,5 +62,7 @@ export {
   Media,
   About,
   Work,
-  sequelize
+  sequelize,
+  startUp,
+  closeDatabase
 }

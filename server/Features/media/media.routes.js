@@ -5,9 +5,11 @@ import BaseService from '../../Shared/Services/BaseService.js'
 import BaseController from '../../Shared/Controllers/BaseController.js'
 import * as imgController from '../image/imgController.js'
 import { Auth } from '../../Shared/Auth/Auth.js'
-import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
+import * as schemas from './mediaSchema.mjs'
+import { Validator } from 'req-valid-express'
+import { emptyObject } from './mediaHelper.js'
 
-const mediaRepo = new GeneralRepository(Media)
+const mediaRepo = new GeneralRepository(Media, emptyObject)
 const mediaService = new BaseService(
   mediaRepo,
   'media',
@@ -19,8 +21,6 @@ const mediaService = new BaseService(
 )
 const media = new BaseController(mediaService)
 
-const mediaCreate = [{ name: 'title', type: 'string' }, { name: 'type', type: 'string' }, { name: 'text', type: 'string' }, { name: 'url', type: 'string' }, { name: 'enable', type: 'boolean' }]
-const mediaUpdate = [{ name: 'title', type: 'string' }, { name: 'type', type: 'string' }, { name: 'text', type: 'string' }, { name: 'url', type: 'string' }, { name: 'enable', type: 'boolean' }]
 
 const mediaRouter = express.Router()
 
@@ -31,71 +31,54 @@ mediaRouter.get(
 
 mediaRouter.delete(
   '/imgs/:id',
-  MiddlewareHandler.middIntId('id'),
+    Validator.paramId('id', Validator.ValidReg.INT),
   imgController.delImagesFromDb
 )
 
 mediaRouter.post(
   '/videos/create',
   Auth.verifyToken,
-  MiddlewareHandler.validateFields(mediaCreate),
+  //Validator.validateBody(schemas.create),
   media.create
 )
 
 mediaRouter.get(
-  '/videos',
+  '/videos/public',
   media.getAll
 )
 
 mediaRouter.get(
-  '/videos/:id',
-  MiddlewareHandler.middIntId('id'),
+  '/videos/public/:id',
+    Validator.paramId('id', Validator.ValidReg.INT),
   media.getById
 )
 
 mediaRouter.get(
-  '/admin/videos',
+  '/videos',
   Auth.verifyToken,
   media.getAdminAll
 )
 
 mediaRouter.get(
-  '/admin/videos/:id',
+  '/videos/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
+    Validator.paramId('id', Validator.ValidReg.INT),
   media.getAdminById
 )
 
 mediaRouter.put(
   '/videos/update/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
-  MiddlewareHandler.validateFields(mediaUpdate),
+    Validator.paramId('id', Validator.ValidReg.INT),
+   //Validator.validateBody(schemas.update),
   media.update
 )
 
 mediaRouter.delete(
   '/videos/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
+    Validator.paramId('id', Validator.ValidReg.INT),
   media.delete
 )
 
 export default mediaRouter
-/* //imagenes
-mediaRouter.get('/imgs', auth.verifyToken, media.getImagesController)
-
-mediaRouter.delete('/imgs/:id', auth.verifyToken,  middIntId, media.deleteImagesController)
-//videos
-mediaRouter.post('/videos/create', auth.verifyToken, validateFields(mediaCreate), media.createMediaController)
-
-mediaRouter.get('/videos',  media.getMediaController)//Ruta libre
-
-mediaRouter.get('/videos/:id',  middIntId, media.getByIdMediaController)//Ruta libre
-
-mediaRouter.get('/admin/videos',auth.verifyToken, media.getAdminMediaController)
-
-mediaRouter.put('/videos/update/:id',  auth.verifyToken,  middIntId, validateFields(mediaUpdate), media.updateMediaController)
-
-mediaRouter.delete('/videos/:id',  auth.verifyToken, middIntId, media.deleteMediaController)
-*/

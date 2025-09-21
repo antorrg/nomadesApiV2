@@ -3,13 +3,12 @@ import { Work } from '../../Configs/database.js'
 import GeneralRepository from '../../Shared/Repositories/GeneralRepositoy.js'
 import BaseService from '../../Shared/Services/BaseService.js'
 import BaseController from '../../Shared/Controllers/BaseController.js'
-import ImageHandler from '../../Configs/ImageHandler.js'
+import ImgsService from '../../Shared/Services/ImgsService.js'
 import { WorkHelp } from './WorkHelp.js'
-import MiddlewareHandler from '../../Shared/Middlewares/MiddlewareHandler.js'
+import { Validator } from 'req-valid-express'
 import { Auth } from '../../Shared/Auth/Auth.js'
+import * as schemas from './workschemas.mjs'
 
-const workCreate = [{ name: 'title', tipe: 'string' }, { name: 'image', type: 'string' }, { name: 'text', type: 'string' }, { name: 'useImg', type: 'boolean' }]
-const workUpdate = [{ name: 'title', tipe: 'string' }, { name: 'image', type: 'string' }, { name: 'text', type: 'string' }, { name: 'enable', type: 'boolean' }, { name: 'saver', type: 'boolean' }, { name: 'useImg', type: 'boolean' }]
 
 const workRepo = new GeneralRepository(Work, WorkHelp.dataEmptyWork)
 const workServ = new BaseService(
@@ -18,7 +17,7 @@ const workServ = new BaseService(
   'title',
   WorkHelp.cleaner,
   true,
-  ImageHandler,
+  ImgsService,
   'image'
 )
 const work = new BaseController(workServ)
@@ -28,36 +27,40 @@ const workRouter = express.Router()
 workRouter.get('/public', work.getAll)
 workRouter.get(
   '/public/:id',
-  MiddlewareHandler.middIntId('id'),
+   Validator.paramId('id', Validator.ValidReg.INT),
   work.getById
 )
-workRouter.get('/', Auth.verifyToken, work.getAdminAll)
+workRouter.get(
+  '/', 
+  Auth.verifyToken, 
+  work.getAdminAll)
 
 workRouter.get(
   '/:id',
-  MiddlewareHandler.middIntId('id'),
+   Auth.verifyToken, 
+   Validator.paramId('id', Validator.ValidReg.INT),
   work.getAdminById
 )
 
 workRouter.post(
   '/create',
   Auth.verifyToken,
-  MiddlewareHandler.validateFields(workCreate),
+  Validator.validateBody(schemas.create),
   work.create
 )
 
 workRouter.put(
   '/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
-  MiddlewareHandler.validateFields(workUpdate),
+  Validator.paramId('id', Validator.ValidReg.INT),
+   Validator.validateBody(schemas.update),
   work.update
 )
 
 workRouter.delete(
   '/:id',
   Auth.verifyToken,
-  MiddlewareHandler.middIntId('id'),
+  Validator.paramId('id', Validator.ValidReg.INT),
   work.delete
 )
 
